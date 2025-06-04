@@ -9,6 +9,7 @@ import { CollaboratorDataService } from './collaborator-data.service';
 import { Collaborator } from './collaborator';
 import { CollaboratorCreateComponent } from './collaborators-create/collaborator-create.component';
 import { CommonModule } from '@angular/common';
+import { CollaboratorFormComponent } from './collaborator-form/collaborator-form.component';
 
 @Component({
   selector: 'app-collaborators',
@@ -20,7 +21,8 @@ import { CommonModule } from '@angular/common';
     CollaboratorsBulletsComponent,
     CollaboratorHolidaysComponent,
     AssociationsProjectCollaboratorComponent,
-    CollaboratorCreateComponent
+    CollaboratorFormComponent,
+   CollaboratorCreateComponent
   ],
   templateUrl: './collaborators.component.html',
   styleUrls: ['./collaborators.component.css']
@@ -34,6 +36,8 @@ export class CollaboratorsComponent {
   collaboratorUpdated = this.collaboratorSignalService.updatedCollaborator;
   selectedCollaboratorHolidays = this.collaboratorSignalService.selectedCollaboratorHoliday;
   selectedCollaboratorProject = this.collaboratorSignalService.selectedCollaboratorProjects;
+  isCreatingCollaboratorSignal= this.collaboratorSignalService.isCreatingCollaborator;
+  createCollaborator = this.collaboratorSignalService.creatingCollaborator;
 
   collaborators = signal<Collaborator[]>([]);
 
@@ -51,6 +55,13 @@ export class CollaboratorsComponent {
     this.collaboratorSignalService.selectCollaborator(undefined);
     this.collaboratorSignalService.selectCollaboratorHolidays(undefined);
 
+    effect(() => {
+      const collaboratorCreated = this.createCollaborator();
+
+      if (collaboratorCreated) {
+        this.collaborators.update(collaborators => [...collaborators, collaboratorCreated]);
+      }
+    })
 
     effect(() => {
       const updated = this.collaboratorUpdated();
@@ -58,6 +69,16 @@ export class CollaboratorsComponent {
         this.collaborators.update(collabs =>
           collabs.map(c => c.collabId === updated.collabId ? updated : c)
         )
+        this.collaboratorDataService.updateCollaborator(updated).subscribe({
+          next: (updatedCollab) => {
+            this.collaborators.update((collabs: Collaborator[]) =>
+          collabs.map((collab: Collaborator) =>
+            collab.collabId === updatedCollab.collabId ? updatedCollab : collab
+          )
+        );
+      },
+          error: (err) => console.error('Erros updating collaborators:', err)
+        });
       }
     });
 
@@ -70,6 +91,6 @@ export class CollaboratorsComponent {
   }
 
   startCreate() {
-    this.collaboratorSignalService.startCreateCollaborator();
+    this.collaboratorSignalService.createCollaborator();
   }
 }

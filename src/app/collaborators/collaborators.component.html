@@ -4,14 +4,15 @@
 <app-collaborators-bullets [collaborators]="collaborators()">
 </app-collaborators-bullets>
 
-@if (!collaboratorSignalService.isCreatingCollaborator()) {
-<button data-test-id="create-collab-button" (click)="collaboratorSignalService.startCreateCollaborator()">
-    Criar Colaborador
+@if(!isCreatingCollaboratorSignal()) {
+<button data-test-id="create-collaborator-button" (click)="collaboratorSignalService.createCollaborator()">
+    Create Collaborator
 </button>
 }
-@else {
-<app-collaborator-create />
+@else{
+<app-collaborator-form />
 }
+
 
 
 <p></p>

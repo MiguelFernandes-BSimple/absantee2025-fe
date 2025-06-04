@@ -1,0 +1,23 @@
+@if (isCreatingForm() || isEditingCollaboratorForm()) {
+    <form [formGroup]="collaboratorForm" (ngSubmit)="save()" class="form-card">
+      <h2>{{ isEditingCollaboratorForm() ? 'Edit Collaborator' : 'Add Collaborator' }}</h2>
+    
+      <div>
+        <label class="form-label">Names</label>
+        <input type="text" formControlName="names" class="form-input" />
+      </div>
+    
+      <div class="form-row">
+        <label class="form-label">Surnames</label>
+        <input type="text" formControlName="surnames" class="form-input" />
+      </div>
+    
+      <div class="actions">
+        <button type="button" (click)="cancel()">Cancel</button>
+        <button type="submit" [disabled]="collaboratorForm.invalid">
+          {{ isEditingCollaboratorForm() ? 'Save' : 'Add' }}
+        </button>
+      </div>
+    </form>
+    
+    }
